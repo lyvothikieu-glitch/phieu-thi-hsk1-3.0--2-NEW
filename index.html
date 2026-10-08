@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phiếu Làm Bài HSK 3.0 - Cấp Độ 1 (Đề 2)</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f0f2f5; margin: 0; padding: 20px; color: #333; }
+        .container { max-width: 900px; margin: 0 auto; background: #fff; padding: 30px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        h1, h2 { text-align: center; color: #d32f2f; margin-bottom: 5px; }
+        .subtitle { text-align: center; color: #666; margin-bottom: 30px; }
+        
+        .student-info { display: flex; gap: 15px; margin-bottom: 30px; flex-wrap: wrap; background: #fafafa; padding: 15px; border-radius: 8px; border: 1px solid #eee; }
+        .student-info input { flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 5px; min-width: 200px; font-size: 16px; }
+        
+        .grid-container { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
+        @media (max-width: 768px) { .grid-container { grid-template-columns: 1fr; } }
+        
+        .main-title { font-size: 20px; font-weight: bold; text-align: center; margin-bottom: 20px; color: #fff; background: #d32f2f; padding: 10px; border-radius: 5px; }
+        .section-title { background: #ffebee; padding: 10px 15px; font-weight: bold; margin: 20px 0 15px 0; border-left: 4px solid #d32f2f; color: #c62828; }
+        
+        .question { display: flex; align-items: center; margin-bottom: 12px; padding: 5px 0; }
+        .question-num { font-weight: bold; width: 40px; font-size: 16px; color: #555; }
+        .options { display: flex; gap: 12px; flex-wrap: wrap; }
+        
+        .options label {
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            width: 35px; height: 35px; border-radius: 50%;
+            border: 2px solid #ccc; background: #fff; font-weight: bold;
+            transition: all 0.2s; color: #555;
+        }
+        .options input[type="radio"] { display: none; }
+        .options input[type="radio"]:checked + span { color: #fff; }
+        .options label:has(input[type="radio"]:checked) {
+            background-color: #d32f2f; border-color: #d32f2f;
+        }
+        
+        .submit-btn { display: block; width: 100%; background: #d32f2f; color: #fff; padding: 15px; border: none; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 40px; transition: background 0.3s; text-transform: uppercase; }
+        .submit-btn:hover { background: #b71c1c; }
+        
+        #result-box { display: none; margin-top: 30px; padding: 25px; border-radius: 8px; border: 2px solid #4CAF50; background-color: #f9fff9; }
+        .score-highlight { font-size: 24px; font-weight: bold; }
+        .wrong-list { margin-top: 15px; line-height: 1.8; }
+        .wrong-item { color: #d32f2f; margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px dashed #ccc; }
+        .correct-item { color: #388e3c; font-weight: bold; background: #e8f5e9; padding: 2px 8px; border-radius: 4px;}
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>汉语水平考试 HSK (一级)</h1>
+    <div class="subtitle">Phiếu Trả Lời (答题卡) - HSK 3.0 - Mẫu Đề 2</div>
+
+    <div class="student-info">
+        <input type="text" id="studentName" placeholder="Họ và tên (姓名)">
+        <input type="text" id="studentID" placeholder="Mã số học viên (nếu có)">
+    </div>
+
+    <div class="grid-container">
+        <!-- Cột phần Nghe -->
+        <div id="col-listening">
+            <div class="main-title">一、听力 (Phần Nghe)</div>
+        </div>
+        
+        <!-- Cột phần Đọc -->
+        <div id="col-reading">
+             <div class="main-title">二、阅读 (Phần Đọc)</div>
+        </div>
+    </div>
+
+    <button class="submit-btn" onclick="submitExam()">Nộp bài & Chấm điểm</button>
+
+    <div id="result-box"></div>
+</div>
+
+<script>
+    const examStructure = [
+        {
+            col: 'col-listening',
+            parts: [
+                { title: "第一部分 (Câu 1-5)", start: 1, end: 5, opts: ['A','B','C'] },
+                { title: "第二部分 (Câu 6-10)", start: 6, end: 10, opts: ['A','B','C'] },
+                { title: "第三部分 (Câu 11-15)", start: 11, end: 15, opts: ['A','B','C','D','E','F'] },
+                { title: "第四部分 (Câu 16-20)", start: 16, end: 20, opts: ['A','B','C'] }
+            ]
+        },
+        {
+            col: 'col-reading',
+            parts: [
+                { title: "第一部分 (Câu 21-25)", start: 21, end: 25, opts: ['A','B','C','D','E','F'] },
+                { title: "第二部分 (Câu 26-30)", start: 26, end: 30, opts: ['A','B','C','D','E','F'] },
+                { title: "第三部分 (Câu 31-35)", start: 31, end: 35, opts: ['A','B','C','D','E','F'] },
+                { title: "第四部分 (Câu 36-40)", start: 36, end: 40, opts: ['A','B','C'] }
+            ]
+        }
+    ];
+
+    // Đáp án được cập nhật theo Đề 2
+    const answerKey = {
+        1:'A', 2:'C', 3:'A', 4:'A', 5:'B',
+        6:'B', 7:'C', 8:'B', 9:'A', 10:'A',
+        11:'F', 12:'A', 13:'B', 14:'D', 15:'E',
+        16:'C', 17:'A', 18:'B', 19:'A', 20:'C',
+        21:'D', 22:'F', 23:'C', 24:'B', 25:'A',
+        26:'E', 27:'A', 28:'D', 29:'C', 30:'B',
+        31:'F', 32:'C', 33:'B', 34:'A', 35:'E',
+        36:'C', 37:'A', 38:'A', 39:'B', 40:'C'
+    };
+
+    window.onload = function() {
+        examStructure.forEach(section => {
+            const container = document.getElementById(section.col);
+            section.parts.forEach(part => {
+                let html = `<div class="section-title">${part.title}</div>`;
+                for(let i = part.start; i <= part.end; i++) {
+                    html += `<div class="question">
+                                <div class="question-num">${i}.</div>
+                                <div class="options">`;
+                    part.opts.forEach(opt => {
+                        html += `<label>
+                                    <input type="radio" name="q${i}" value="${opt}">
+                                    <span>${opt}</span>
+                                 </label>`;
+                    });
+                    html += `   </div>
+                             </div>`;
+                }
+                container.innerHTML += html;
+            });
+        });
+    }
+
+    function submitExam() {
+        const studentName = document.getElementById("studentName").value || "Học viên ẩn danh";
+        let correctCount = 0;
+        let wrongCount = 0;
+        let wrongDetails = [];
+
+        for(let i = 1; i <= 40; i++) {
+            const selected = document.querySelector(`input[name="q${i}"]:checked`);
+            const userAnswer = selected ? selected.value : "Chưa chọn";
+            const correctAnswer = answerKey[i];
+
+            if(userAnswer === correctAnswer) {
+                correctCount++;
+            } else {
+                wrongCount++;
+                wrongDetails.push(`<div class="wrong-item">Câu ${i}: Bạn chọn <b>${userAnswer}</b> ➔ Đáp án đúng là <span class="correct-item">${correctAnswer}</span></div>`);
+            }
+        }
+
+        const resultBox = document.getElementById("result-box");
+        resultBox.style.display = "block";
+        
+        let scoreHTML = `<h2 style="color:#388e3c;">Kết Quả Làm Bài</h2>`;
+        scoreHTML += `<p><b>Học viên:</b> ${studentName}</p>`;
+        scoreHTML += `<p><b>Số câu đúng:</b> <span class="score-highlight" style="color:#388e3c;">${correctCount}/40</span></p>`;
+        scoreHTML += `<p><b>Số câu sai / bỏ trống:</b> <span class="score-highlight" style="color:#d32f2f;">${wrongCount}/40</span></p>`;
+
+        if(wrongCount > 0) {
+            scoreHTML += `<hr><h3 style="color:#d32f2f;">Chi tiết các câu sai:</h3><div class="wrong-list">`;
+            scoreHTML += wrongDetails.join('');
+            scoreHTML += `</div>`;
+        } else {
+            scoreHTML += `<div style="margin-top:20px; padding:15px; background:#e8f5e9; color:#2e7d32; border-radius:5px; text-align:center; font-weight:bold;">🎉 Tuyệt vời! Bạn đã trả lời đúng toàn bộ 40 câu hỏi.</div>`;
+        }
+
+        resultBox.innerHTML = scoreHTML;
+        resultBox.scrollIntoView({ behavior: 'smooth' });
+    }
+</script>
+
+</body>
+</html>
